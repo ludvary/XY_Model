@@ -164,8 +164,8 @@ function main()
         T_arr[i] = T
         E_avg_arr[i] = mean(E_arr)
         M_avg_arr[i] = mean(M_arr)
-        Cv_arr[i] = var(E_arr)/T^2
-        Chi_arr[i] = var(M_arr)/T
+        Cv_arr[i] = N*var(E_arr)/T^2
+        Chi_arr[i] = N*var(M_arr)/T
     end
 
     
