@@ -10,7 +10,7 @@ using PolyFit
 const L = 10                        # side length of square lattice
 const eqm_steps = 100_000           # number of iterations (not mc steps) in one call of do_eqm() function
 const sim_steps = 20_000            # number of iterations (not mc steps) in one call of do_sim() function
-const config_avs = 2000
+const config_avs = 2000             # number of ensemble averages to take
 const N = L^2                       # total number of spins
 const J = 1                         # greater this number, greater the interaction strength
 const B_mag = 0                     # magnetic field
@@ -152,6 +152,8 @@ function main()
     Chi_arr = zeros(Float64, number_of_temps)
 
     # init matrices
+    # each row represents a separate system, then after everything is done and the matrices are filled we 
+    # take average across all the rows and fill the above arrays with the final values.
     E_avg_mat = [zeros(Float64, number_of_temps) for _ in 1:config_avs]
     M_avg_mat = [zeros(Float64, number_of_temps) for _ in 1:config_avs]
     Cv_mat = [zeros(Float64, number_of_temps) for _ in 1:config_avs]
@@ -189,26 +191,7 @@ function main()
         Chi_arr[i] = sum(Chi_mat[v][i] for v in 1:config_avs)/config_avs
     end
 
-    
-    # # curve fitting using a polynomial of degree 15
-    # order = 15
-    # poly_Cv = polyfit(T_arr, Cv_arr, order)         # this gives you coefficients of various powers of x from x^0 upto x^(order)
-    # poly_Chi = polyfit(T_arr, Chi_arr, order)
-    # poly_E = polyfit(T_arr, E_avg_arr, order)
-    # poly_M = polyfit(T_arr, M_avg_arr, order)
-
-    # # function to extract the coefficients and compute the interpolating polynomial at point x
-    # function fitting(poly, x)
-    #     value = 0
-    #     for i in 0:order
-    #         value += poly[i]*x^i
-    #     end
-    #     return value
-    # end
-
-
     # plots
-    # plot(T_arr, [fitting(poly_E, x) for x in T_arr], color="navy", label="Interpolation($(order)th order Poly)")
     plot(T_arr, E_avg_arr, lw=0.4, color="navy", alpha=0.6, label="<E>")
     scatter(T_arr, E_avg_arr, color="navy", s=2, alpha=0.5)
     xlabel("T", fontsize=20)
@@ -217,7 +200,6 @@ function main()
     show()
 
 
-    # plot(T_arr, [fitting(poly_M, x) for x in T_arr], color="maroon", label="Interpolation ($(order)th order Poly)")
     plot(T_arr, M_avg_arr, lw=0.4, color="maroon", alpha=0.6, label="<M>")
     scatter(T_arr, M_avg_arr, color="maroon", s=2, alpha=0.5)
     xlabel("T", fontsize=20)
@@ -225,7 +207,6 @@ function main()
     legend()
     show()
 
-    # plot(T_arr, [fitting(poly_Cv, x) for x in T_arr], color="grey", label="Interpolation ($(order)th order Poly)")
     plot(T_arr, Cv_arr, lw=0.4, color="black", alpha=0.6, label="Cv")
     scatter(T_arr, Cv_arr, color="black", s=2, alpha=0.5)
     xlabel("T", fontsize=20)
@@ -233,7 +214,6 @@ function main()
     legend()
     show()
 
-    # plot(T_arr, [fitting(poly_Chi, x) for x in T_arr], color="green", label="Interpolation ($(order)th order Poly)")
     plot(T_arr, Chi_arr, lw=0.4, color="brown", alpha=0.6, label=L"\chi")
     scatter(T_arr, Chi_arr, color="brown", s=2, alpha=0.5)
     xlabel("T", fontsize=20)
