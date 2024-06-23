@@ -1,4 +1,4 @@
-include("even_faster_lattice.jl")
+include("lattice.jl")
 using .LatticeJl
 using Statistics
 using LinearAlgebra
